@@ -116,6 +116,14 @@ async def health():
     }
 
 
+@app.get("/api/usage")
+async def usage():
+    """Return token usage statistics from the JSONL log."""
+    from app.monitoring.token_logger import get_usage_summary
+
+    return get_usage_summary()
+
+
 # ---------------------------------------------------------------------------
 # Serve frontend static files
 # ---------------------------------------------------------------------------

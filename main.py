@@ -6,6 +6,7 @@ Usage:
     python main.py ingest      # Ingest data into Pinecone (run once)
     python main.py query       # Interactive query mode (CLI)
     python main.py stats       # Show Pinecone index stats
+    python main.py usage       # Show token usage statistics
     python main.py config      # Print current configuration
 """
 
@@ -92,6 +93,41 @@ def cmd_stats():
         print(f"  {k}: {v}")
 
 
+def cmd_usage():
+    """Show token usage statistics from logged requests."""
+    from app.monitoring.token_logger import get_usage_summary
+
+    summary = get_usage_summary()
+
+    print("=" * 60)
+    print("SAVARKAR GPT - Token Usage Statistics")
+    print("=" * 60)
+
+    if summary["total_requests"] == 0:
+        print("\n  No requests logged yet. Ask some questions first!\n")
+        return
+
+    print(f"\n  Total requests:        {summary['total_requests']}")
+    print(f"  Total input tokens:    {summary['total_input_tokens']:,}")
+    print(f"  Total output tokens:   {summary['total_output_tokens']:,}")
+    print(f"  Total tokens:          {summary['total_tokens']:,}")
+    print(f"  Avg input tokens/req:  {summary['avg_input_tokens']:,}")
+    print(f"  Avg output tokens/req: {summary['avg_output_tokens']:,}")
+    print(f"  Avg latency:           {summary['avg_latency_ms']:,} ms")
+
+    recent = summary.get("recent_requests", [])
+    if recent:
+        print(f"\n  --- Last {len(recent)} Requests ---")
+        for i, r in enumerate(recent, 1):
+            q = r["question"][:50] + ("..." if len(r["question"]) > 50 else "")
+            print(
+                f"  {i}. [{r['timestamp']}] \"{q}\" "
+                f"| in={r['input_tokens']} out={r['output_tokens']} "
+                f"| {r['latency_ms']}ms"
+            )
+    print()
+
+
 def cmd_config():
     """Print current configuration."""
     settings.print_config()
@@ -109,6 +145,7 @@ COMMANDS = {
     "ingest": cmd_ingest,
     "query": cmd_query,
     "stats": cmd_stats,
+    "usage": cmd_usage,
     "config": cmd_config,
 }
 

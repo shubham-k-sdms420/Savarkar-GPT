@@ -18,6 +18,7 @@ Built with a **modular, plug-and-play architecture** — every component (LLM, e
 - **7,742 Vector Embeddings** — full knowledge base indexed in Pinecone for fast semantic search
 - **Web UI** — clean, dark-themed "museum-grade" chat interface with sample question chips and collapsible source citations
 - **CLI Mode** — interactive terminal-based Q&A for quick testing
+- **Token Usage Monitoring** — every request's input/output tokens and latency are logged to a JSONL file, viewable via CLI or API
 - **Fully Configurable** — all models, API keys, and parameters managed via `.env`
 
 ---
@@ -53,6 +54,8 @@ Savarkar GPT/
 │   │   └── gemini.py             # Gemini LLM wrapper with historian prompt
 │   ├── pipeline/
 │   │   └── ingest.py             # Data ingestion pipeline (chunk → embed → upsert)
+│   ├── monitoring/
+│   │   └── token_logger.py       # Token usage logging to JSONL (input/output/latency)
 │   ├── rag/
 │   │   └── chain.py              # RAG orchestration (retrieve → augment → generate)
 │   └── vectorstore/
@@ -67,7 +70,9 @@ Savarkar GPT/
 │
 ├── data/                         # Source PDF books (6 files)
 ├── json_output/                  # Preprocessed JSON from PDFs (6 books + index)
-├── main.py                       # CLI entry point (serve, ingest, query, stats, config)
+├── logs/                         # Token usage logs (auto-created, gitignored)
+│   └── token_usage.jsonl         # One JSON line per request
+├── main.py                       # CLI entry point (serve, ingest, query, stats, usage, config)
 ├── pdf_to_json.py                # PDF-to-structured-JSON conversion script
 ├── requirements.txt              # Python dependencies
 └── .env                          # API keys and configuration (not committed)
@@ -170,6 +175,14 @@ python3 main.py query
 
 Type questions in the terminal. Type `quit` to exit.
 
+### Token Usage Monitoring
+
+```bash
+python3 main.py usage
+```
+
+Shows total requests, token counts (input/output), averages, and the last 10 queries — all logged automatically in the background.
+
 ### Other Commands
 
 | Command | Description |
@@ -178,6 +191,7 @@ Type questions in the terminal. Type `quit` to exit.
 | `python3 main.py ingest` | Run data ingestion pipeline |
 | `python3 main.py query` | Interactive CLI Q&A |
 | `python3 main.py stats` | Show Pinecone index statistics |
+| `python3 main.py usage` | Show token usage statistics |
 | `python3 main.py config` | Print current configuration |
 
 ---
@@ -216,6 +230,7 @@ Every component is configurable via `.env` — no code changes needed:
 |---|---|---|
 | `POST` | `/api/query` | Send a question, get a grounded answer with sources |
 | `GET` | `/api/health` | Health check (model, index, readiness) |
+| `GET` | `/api/usage` | Token usage statistics (total, averages, recent requests) |
 | `GET` | `/` | Serve the web UI |
 
 ### Example API call

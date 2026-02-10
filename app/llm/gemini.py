@@ -8,10 +8,13 @@ Plug-and-play: Swap to another LLM by replacing this module
 with the same interface (get_llm, generate).
 """
 
+import time
+
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage, SystemMessage
 
 from app.config.settings import settings
+from app.monitoring.token_logger import log_token_usage
 
 
 # System prompt — historian persona, grounded strictly to knowledge base
@@ -39,6 +42,13 @@ CONTENT RULES:
 - If the reference material does not contain enough information, say: "The available historical sources in my collection do not cover this topic in sufficient detail to give you a reliable answer."
 - If the question is unrelated to Savarkar or the Indian history covered in the reference material, politely decline.
 - Stick strictly to verifiable historical facts. Avoid emotional or persuasive language.
+
+LENGTH RULES:
+- Keep answers between 150–350 words (2–4 concise paragraphs).
+- For simple factual questions (e.g., "When was Savarkar born?"), answer in 1–2 short paragraphs.
+- For broader questions (e.g., "What was his role in the independence movement?"), use 3–4 paragraphs but stay focused and avoid repetition.
+- ALWAYS complete your final sentence. Never stop mid-thought.
+- Quality over quantity — cover the key facts clearly, don't pad the answer.
 
 REFERENCE MATERIAL:
 {context}
@@ -86,5 +96,19 @@ class GeminiLLM:
         system_msg = SystemMessage(content=SYSTEM_PROMPT.format(context=context))
         human_msg = HumanMessage(content=query)
 
+        start = time.time()
         response = self.llm.invoke([system_msg, human_msg])
+        latency_ms = int((time.time() - start) * 1000)
+
+        # Log token usage
+        usage = getattr(response, "usage_metadata", None) or {}
+        log_token_usage(
+            question=query,
+            model=self.model_name,
+            input_tokens=usage.get("input_tokens", 0),
+            output_tokens=usage.get("output_tokens", 0),
+            total_tokens=usage.get("total_tokens", 0),
+            latency_ms=latency_ms,
+        )
+
         return response.content

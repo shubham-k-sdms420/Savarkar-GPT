@@ -26,6 +26,8 @@ env/
 # --- Data Files (PDFs & Processed JSON) ---
 data/
 json_output/
+Marathi/
+Savarkar_GPT_Marathi_Hindi_OCR_Integration_Limitations.docx
 
 # --- Model Cache (Sentence Transformers downloads) ---
 .cache/
@@ -46,6 +48,7 @@ Thumbs.db
 desktop.ini
 
 # --- Logs ---
+logs/
 *.log
 
 # --- Misc ---
