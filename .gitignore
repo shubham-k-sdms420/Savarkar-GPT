@@ -1,0 +1,53 @@
+# =============================================================
+# Savarkar GPT - .gitignore
+# =============================================================
+
+# --- Environment & Secrets ---
+.env
+*.env
+.env.*
+!.env.example
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+
+# --- Virtual Environment ---
+venv/
+.venv/
+env/
+
+# --- Data Files (PDFs & Processed JSON) ---
+data/
+json_output/
+
+# --- Model Cache (Sentence Transformers downloads) ---
+.cache/
+*.bin
+*.safetensors
+
+# --- IDE ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.cursor/
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Logs ---
+*.log
+
+# --- Misc ---
+*.bak
+*.tmp
