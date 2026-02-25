@@ -6,7 +6,7 @@ Built with a **modular, plug-and-play architecture** — every component (LLM, e
 
 ### Demo Video
 
-[Watch the demo on Google Drive]([https://drive.google.com/file/d/1Tg3d4LqzVDOMPmUyky1DxwaZm8nPY6Wa/view?usp=sharing](https://drive.google.com/file/d/1oEuuwq0uo5RQnBjz7RQumTcsqwchxaE8/view?usp=sharing))
+[Watch the demo on Google Drive](https://drive.google.com/file/d/1oEuuwq0uo5RQnBjz7RQumTcsqwchxaE8/view?usp=sharing)
 
 ---
 
